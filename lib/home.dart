@@ -122,6 +122,23 @@ class _HomeScreenState extends State<HomeScreen> {
                           (e) {
                             Color color = AppColors.failedColor;
 
+                            if (holdingText.isNotEmpty) {
+                              for (var iw in holdingText) {
+                                final eachInputtedText = iw.split('').toList();
+                                for (int imc = 0;
+                                    imc < eachInputtedText.length;
+                                    imc++) {
+                                  if (winningWord[imc] == e) {
+                                    color = AppColors.correctColor;
+                                  } else if (winningWord.contains(e)) {
+                                    color = AppColors.wrongPosColor;
+                                  } else if (eachInputtedText.contains(e)) {
+                                    color = Colors.transparent;
+                                  }
+                                }
+                              }
+                            }
+
                             return GestureDetector(
                               onTap: () {
                                 if (e.length > 1) {
