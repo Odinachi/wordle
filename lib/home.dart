@@ -124,19 +124,25 @@ class _HomeScreenState extends State<HomeScreen> {
                             Color color = AppColors.failedColor;
 
                             if (holdingText.isNotEmpty) {
-                              for (String iw in holdingText) {
-                                final eachInputtedText = iw.split('').toList();
-                                if (eachInputtedText.contains(e)) {
-                                  for (int imc = 0;
-                                      imc < eachInputtedText.length;
-                                      imc++) {
-                                    if (winningWord.contains(e)) {
-                                      color = AppColors.wrongPosColor;
-                                    } else if (eachInputtedText.contains(e)) {
-                                      color = Colors.transparent;
-                                    } else if (winningWord[imc] ==
-                                        eachInputtedText[imc]) {
+                              for (var words in holdingText) {
+                                final splittedWords = words.split("");
+
+                                if (splittedWords.contains(e)) {
+                                  for (int pos = 0;
+                                      pos < splittedWords.length;
+                                      pos++) {
+                                    if (winningWord[pos] == e &&
+                                        splittedWords[pos] == e) {
                                       color = AppColors.correctColor;
+                                      break;
+                                    } else if (color !=
+                                            AppColors.correctColor &&
+                                        winningWord.contains(e)) {
+                                      color = AppColors.wrongPosColor;
+                                      break;
+                                    } else {
+                                      color = Colors.transparent;
+                                      break;
                                     }
                                   }
                                 }
