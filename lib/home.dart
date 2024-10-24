@@ -36,6 +36,14 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {});
   }
 
+  void _reset() {
+    winningWord = allValidWords[Random().nextInt(allValidWords.length)];
+    typingIndex = 0;
+    holdingText.clear();
+    inputtedString = '';
+    setState(() {});
+  }
+
   @override
   void initState() {
     _fetchWords();
@@ -81,8 +89,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               color = AppColors.wrongPosColor;
                             }
                           }
-
-                          print(winningWord);
                           return Expanded(
                             child: Container(
                               height: 50,
@@ -124,29 +130,23 @@ class _HomeScreenState extends State<HomeScreen> {
                             Color color = AppColors.failedColor;
 
                             if (holdingText.isNotEmpty) {
-                              for (var words in holdingText) {
-                                final splittedWords = words.split("");
+                              holdingText.forEach((eachWord) {
+                                if (eachWord.contains(e)) {
+                                  color = AppColors.wrongPosColor;
+                                  if (!winningWord.contains(e)) {
+                                    color = Colors.transparent;
+                                  } else {
+                                    for (int i = 0; i < eachWord.length; i++) {
+                                      if (eachWord[i] == e &&
+                                          winningWord[i] == e) {
+                                        color = AppColors.correctColor;
 
-                                if (splittedWords.contains(e)) {
-                                  for (int pos = 0;
-                                      pos < splittedWords.length;
-                                      pos++) {
-                                    if (winningWord[pos] == e &&
-                                        splittedWords[pos] == e) {
-                                      color = AppColors.correctColor;
-                                      break;
-                                    } else if (color !=
-                                            AppColors.correctColor &&
-                                        winningWord.contains(e)) {
-                                      color = AppColors.wrongPosColor;
-                                      break;
-                                    } else {
-                                      color = Colors.transparent;
-                                      break;
+                                        break;
+                                      }
                                     }
                                   }
                                 }
-                              }
+                              });
                             }
 
                             return GestureDetector(
@@ -158,7 +158,83 @@ class _HomeScreenState extends State<HomeScreen> {
                                         .contains(inputtedString)) {
                                       holdingText.add(inputtedString);
                                       if (inputtedString == winningWord) {
-                                        print(true);
+                                        showModalBottomSheet(
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                            context: context,
+                                            builder: (_) => Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      margin: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 20),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      decoration: BoxDecoration(
+                                                        color: AppColors
+                                                            .whiteColor,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                      child: Column(
+                                                        children: [
+                                                          const Text(
+                                                            "🎉",
+                                                            style: TextStyle(
+                                                                fontSize: 50),
+                                                          ),
+                                                          const Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        30.0),
+                                                            child: Text(
+                                                              "Congrats, You guessed right.",
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                fontSize: 25,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: const Text(
+                                                              "Start  New Game",
+                                                              style: TextStyle(
+                                                                fontSize: 20,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                color: AppColors
+                                                                    .correctColor,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )).then((a) {
+                                          _reset();
+                                        });
                                       } else {
                                         typingIndex += 1;
                                         inputtedString = "";
@@ -234,5 +310,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-// enum InputValidation { right, wrong, positional }
