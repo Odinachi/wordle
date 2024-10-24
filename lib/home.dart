@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:wordle/colors.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,6 +22,25 @@ class _HomeScreenState extends State<HomeScreen> {
   String inputtedString = '';
   final holdingText = <String>[];
   int typingIndex = 0;
+
+  List<String> allValidWords = [];
+
+  String winningWord = '';
+
+  void _fetchWords() async {
+    final words = await rootBundle.loadString("assets/five-letter-words.json");
+    allValidWords =
+        List<String>.from((json.decode(words) as List).map((e) => e as String));
+
+    winningWord = allValidWords[Random().nextInt(allValidWords.length)];
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    _fetchWords();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       return Row(
                         children: List<Widget>.generate(5, (rowIndex) {
                           String text = '';
+
+                          Color color = Colors.transparent;
                           if (columnIndex == typingIndex) {
                             if (inputtedString.isNotEmpty &&
                                 inputtedString.length > rowIndex) {
@@ -47,7 +72,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           } else if (columnIndex < typingIndex) {
                             final rowTextList =
                                 holdingText[columnIndex].split("").toList();
+
                             text = rowTextList[rowIndex];
+
+                            winningWord.split('').forEach((e) {
+                              if (winningWord.contains(text)) {
+                                color = AppColors.wrongPosColor;
+                              } else if (e == text) {
+                                color = AppColors.correctColor;
+                              }
+                            });
                           }
                           return Expanded(
                             child: Container(
@@ -55,16 +89,17 @@ class _HomeScreenState extends State<HomeScreen> {
                               padding: const EdgeInsets.all(8),
                               margin: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
+                                  color: color,
                                   border: Border.all(
                                       color: AppColors.whiteColor
                                           .withOpacity(.5))),
                               child: Center(
                                 child: Text(
                                   text,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: AppColors.whiteColor,
                                     fontWeight: FontWeight.w700,
-                                    fontSize: 17,
+                                    fontSize: 19,
                                   ),
                                 ),
                               ),
@@ -90,10 +125,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               if (e.length > 1) {
                                 if (e == "ENTER" &&
                                     inputtedString.length == 5) {
-                                  ///check that word is valid
-                                  holdingText.add(inputtedString);
-                                  typingIndex += 1;
-                                  inputtedString = "";
+                                  if (allValidWords.contains(inputtedString)) {
+                                    holdingText.add(inputtedString);
+                                    typingIndex += 1;
+                                    inputtedString = "";
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text("Not a valid word")));
+                                  }
                                 } else if (e == "DEL" &&
                                     inputtedString.isNotEmpty) {
                                   inputtedString = inputtedString.substring(
@@ -158,3 +198,5 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+// enum InputValidation { right, wrong, positional }
