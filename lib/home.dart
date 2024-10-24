@@ -81,6 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color = AppColors.wrongPosColor;
                             }
                           }
+
                           print(winningWord);
                           return Expanded(
                             child: Container(
@@ -123,17 +124,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             Color color = AppColors.failedColor;
 
                             if (holdingText.isNotEmpty) {
-                              for (var iw in holdingText) {
+                              for (String iw in holdingText) {
                                 final eachInputtedText = iw.split('').toList();
-                                for (int imc = 0;
-                                    imc < eachInputtedText.length;
-                                    imc++) {
-                                  if (winningWord[imc] == e) {
-                                    color = AppColors.correctColor;
-                                  } else if (winningWord.contains(e)) {
-                                    color = AppColors.wrongPosColor;
-                                  } else if (eachInputtedText.contains(e)) {
-                                    color = Colors.transparent;
+                                if (eachInputtedText.contains(e)) {
+                                  for (int imc = 0;
+                                      imc < eachInputtedText.length;
+                                      imc++) {
+                                    if (winningWord.contains(e)) {
+                                      color = AppColors.wrongPosColor;
+                                    } else if (eachInputtedText.contains(e)) {
+                                      color = Colors.transparent;
+                                    } else if (winningWord[imc] ==
+                                        eachInputtedText[imc]) {
+                                      color = AppColors.correctColor;
+                                    }
                                   }
                                 }
                               }
@@ -147,8 +151,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                     if (allValidWords
                                         .contains(inputtedString)) {
                                       holdingText.add(inputtedString);
-                                      typingIndex += 1;
-                                      inputtedString = "";
+                                      if (inputtedString == winningWord) {
+                                        print(true);
+                                      } else {
+                                        typingIndex += 1;
+                                        inputtedString = "";
+                                      }
                                     } else {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(const SnackBar(
