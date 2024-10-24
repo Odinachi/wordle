@@ -75,14 +75,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             text = rowTextList[rowIndex];
 
-                            winningWord.split('').forEach((e) {
-                              if (winningWord.contains(text)) {
-                                color = AppColors.wrongPosColor;
-                              } else if (e == text) {
-                                color = AppColors.correctColor;
-                              }
-                            });
+                            if (winningWord[rowIndex] == text) {
+                              color = AppColors.correctColor;
+                            } else if (winningWord.contains(text)) {
+                              color = AppColors.wrongPosColor;
+                            }
                           }
+                          print(winningWord);
                           return Expanded(
                             child: Container(
                               height: 50,
@@ -120,68 +119,74 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List<Widget>.from(
                         rowKeys.map(
-                          (e) => GestureDetector(
-                            onTap: () {
-                              if (e.length > 1) {
-                                if (e == "ENTER" &&
-                                    inputtedString.length == 5) {
-                                  if (allValidWords.contains(inputtedString)) {
-                                    holdingText.add(inputtedString);
-                                    typingIndex += 1;
-                                    inputtedString = "";
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text("Not a valid word")));
+                          (e) {
+                            Color color = AppColors.failedColor;
+
+                            return GestureDetector(
+                              onTap: () {
+                                if (e.length > 1) {
+                                  if (e == "ENTER" &&
+                                      inputtedString.length == 5) {
+                                    if (allValidWords
+                                        .contains(inputtedString)) {
+                                      holdingText.add(inputtedString);
+                                      typingIndex += 1;
+                                      inputtedString = "";
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content:
+                                                  Text("Not a valid word")));
+                                    }
+                                  } else if (e == "DEL" &&
+                                      inputtedString.isNotEmpty) {
+                                    inputtedString = inputtedString.substring(
+                                        0, inputtedString.length - 1);
                                   }
-                                } else if (e == "DEL" &&
-                                    inputtedString.isNotEmpty) {
-                                  inputtedString = inputtedString.substring(
-                                      0, inputtedString.length - 1);
+                                } else {
+                                  if (inputtedString.length < 5) {
+                                    inputtedString = "$inputtedString$e";
+                                  }
                                 }
-                              } else {
-                                if (inputtedString.length < 5) {
-                                  inputtedString = "$inputtedString$e";
-                                }
-                              }
-                              setState(() {});
-                            },
-                            child: Container(
-                              height: 40,
-                              width: e.length > 1 ? 40 : 30,
-                              padding: const EdgeInsets.all(5),
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 2.6),
-                              decoration: BoxDecoration(
-                                  color: AppColors.failedColor,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                      color: AppColors.whiteColor
-                                          .withOpacity(.5))),
-                              child: Center(
-                                child: e == "ENTER"
-                                    ? const Icon(
-                                        Icons.start,
-                                        size: 20,
-                                        color: AppColors.whiteColor,
-                                      )
-                                    : e == "DEL"
-                                        ? const Icon(
-                                            Icons.backspace_outlined,
-                                            size: 20,
-                                            color: AppColors.whiteColor,
-                                          )
-                                        : Text(
-                                            e,
-                                            style: const TextStyle(
+                                setState(() {});
+                              },
+                              child: Container(
+                                height: 40,
+                                width: e.length > 1 ? 40 : 30,
+                                padding: const EdgeInsets.all(5),
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 2.6),
+                                decoration: BoxDecoration(
+                                    color: color,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                        color: AppColors.whiteColor
+                                            .withOpacity(.5))),
+                                child: Center(
+                                  child: e == "ENTER"
+                                      ? const Icon(
+                                          Icons.start,
+                                          size: 20,
+                                          color: AppColors.whiteColor,
+                                        )
+                                      : e == "DEL"
+                                          ? const Icon(
+                                              Icons.backspace_outlined,
+                                              size: 20,
                                               color: AppColors.whiteColor,
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 14,
+                                            )
+                                          : Text(
+                                              e,
+                                              style: const TextStyle(
+                                                color: AppColors.whiteColor,
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 14,
+                                              ),
                                             ),
-                                          ),
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
                       ),
                     );
